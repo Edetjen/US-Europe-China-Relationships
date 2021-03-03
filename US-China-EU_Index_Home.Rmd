@@ -10,19 +10,18 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
+library(ggplot2)
+library(grid)
+library(rworldmap)
+library(readxl)
+library(tidyverse)
+
 # Home .Rmd file for the US-China-EU economic relationship index
 
 ```
 
 
 ```{r}
-# Map Experimenting
-
-library(ggplot2)
-library(grid)
-library(rworldmap)
-library(readxl)
-library(tidyverse)
 
 # US-EU TII
 
@@ -45,10 +44,9 @@ trade <- trade_dirty[trade_dirty$year == 2019, ]
 
 trade %>%
   ggplot(aes(x = country, y = tii_us)) +
-  geom_point() +
-  theme_linedraw()
-
-View(trade)
+  geom_col() +
+  theme_linedraw() +
+  coord_flip()
 
 
 # China-EU TII
@@ -69,16 +67,27 @@ trade_dirty_cn <- trade_dirty_cn[trade_dirty_cn$partner != "NA", ]
 trade_cn <- trade_dirty_cn[trade_dirty_cn$year == 2019, ]
 
 trade_cn %>%
-  ggplot(aes(x = country, y = tii)) +
-  geom_point() +
-  theme_linedraw()
+  ggplot(aes(x = country, y = tii_cn)) +
+  geom_col() +
+  theme_linedraw() +
+  coord_flip()
 
 
+# Combined TII Indices
 
-comb_trade <- merge(trade, trade_cn, by = "country") %>%
+comb_trade <- merge(trade, trade_cn, by = "country") 
+
+comb_trade$tii_us <- as.numeric(comb_trade$tii_us) 
+comb_trade$tii_cn <- as.numeric(comb_trade$tii_cn) 
+
+comb_trade <- comb_trade %>%
   select(country, year.x, tii_us, tii_cn) %>%
-  rename(year = year.x)
+  rename(year = year.x) %>%
+  mutate(tii_diff = (tii_us - tii_cn))
 
+comb_trade %>%
+  ggplot(aes(x = tii_diff, y = country)) +
+  geom_col()
 
 
 
@@ -91,6 +100,9 @@ comb_trade <- merge(trade, trade_cn, by = "country") %>%
 
 
 ```{r}
+
+# Map Experimenting
+
 worldMap <- getMap()
 
 # Member States of the European Union
