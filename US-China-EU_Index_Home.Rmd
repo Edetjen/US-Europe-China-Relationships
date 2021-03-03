@@ -24,15 +24,16 @@ library(rworldmap)
 library(readxl)
 library(tidyverse)
 
+# US-EU TII
 
 trade_dirty <- Trade_Index_Indicator <- read_excel("DataJobID-2128207_2128207_T3.xlsx") %>%
-  rename(tii = "Trade Intensity Index")
+  rename(tii_us = "Trade Intensity Index")
 
 trade_dirty <- trade_dirty %>%
   rename(partner = PartnerISO3) %>%
   rename(country = ReporterName) %>%
   rename(year = Year) %>%
-  select(c(partner, tii, country, year)) %>%
+  select(c(partner, tii_us, country, year)) %>%
   mutate(partner = str_replace(partner, pattern = "EU27", 
                                     replacement = "NA")) %>%
   mutate(partner = str_replace(partner, pattern = "USA", 
@@ -43,8 +44,46 @@ trade_dirty <- trade_dirty[trade_dirty$partner != "NA", ]
 trade <- trade_dirty[trade_dirty$year == 2019, ]
 
 trade %>%
+  ggplot(aes(x = country, y = tii_us)) +
+  geom_point() +
+  theme_linedraw()
+
+View(trade)
+
+
+# China-EU TII
+
+trade_dirty_cn <- ChinaTII <- read_excel("ChinaTII.xlsx") %>%
+    rename(tii_cn = "Trade Intensity Index")
+
+trade_dirty_cn <- trade_dirty_cn %>%
+  rename(partner = PartnerISO3) %>%
+  rename(country = ReporterName) %>%
+  rename(year = Year) %>%
+  select(c(partner, tii_cn, country, year)) %>%
+  mutate(partner = str_replace(partner, pattern = "EU27", 
+                                    replacement = "NA"))
+  
+trade_dirty_cn <- trade_dirty_cn[trade_dirty_cn$partner != "NA", ]
+
+trade_cn <- trade_dirty_cn[trade_dirty_cn$year == 2019, ]
+
+trade_cn %>%
   ggplot(aes(x = country, y = tii)) +
-  geom_col()
+  geom_point() +
+  theme_linedraw()
+
+
+
+comb_trade <- merge(trade, trade_cn, by = "country") %>%
+  select(country, year.x, tii_us, tii_cn) %>%
+  rename(year = year.x)
+
+
+
+
+# 1-8 TRADE COMPLEMENTARITY INDEX
+# Description: The trade complementarity index indicates to what extent the export profile of the reporter matches, or complements, the import profile of the partner. A high index may indicate that two countries would stand to gain from increased trade, and may be particularly useful in evaluating prospective bilateral or regional trade agreements.
 
 
 
