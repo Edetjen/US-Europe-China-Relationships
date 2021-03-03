@@ -16,13 +16,42 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 ```{r}
-
 # Map Experimenting
 
 library(ggplot2)
 library(grid)
 library(rworldmap)
+library(readxl)
+library(tidyverse)
 
+
+trade_dirty <- Trade_Index_Indicator <- read_excel("DataJobID-2128207_2128207_T3.xlsx") %>%
+  rename(tii = "Trade Intensity Index")
+
+trade_dirty <- trade_dirty %>%
+  rename(partner = PartnerISO3) %>%
+  rename(country = ReporterName) %>%
+  rename(year = Year) %>%
+  select(c(partner, tii, country, year)) %>%
+  mutate(partner = str_replace(partner, pattern = "EU27", 
+                                    replacement = "NA")) %>%
+  mutate(partner = str_replace(partner, pattern = "USA", 
+                                    replacement = "USA"))
+  
+trade_dirty <- trade_dirty[trade_dirty$partner != "NA", ]
+
+trade <- trade_dirty[trade_dirty$year == 2019, ]
+
+trade %>%
+  ggplot(aes(x = country, y = tii)) +
+  geom_col()
+
+
+
+```
+
+
+```{r}
 worldMap <- getMap()
 
 # Member States of the European Union
@@ -77,10 +106,8 @@ P <- P + theme(#panel.grid.minor = element_line(colour = NA), panel.grid.minor =
 P
 
 
-
-
-
 # Credits: https://egallic.fr/en/european-map-using-r/
+# Also see: https://geocompr.robinlovelace.net/adv-map.html 
 
 ```
 
