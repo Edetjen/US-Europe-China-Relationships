@@ -23,6 +23,17 @@ library(tidyverse)
 
 ```{r}
 
+# Importing Master Dataset
+
+Master_Data_US_China <- read_excel("Master_Data_US-China.xlsx")
+View(Master_Data_US_China)
+
+
+```
+
+
+```{r}
+
 # US-EU TII
 
 trade_dirty <- Trade_Index_Indicator <- read_excel("DataJobID-2128207_2128207_T3.xlsx") %>%
@@ -89,7 +100,7 @@ comb_trade %>%
   ggplot(aes(x = tii_diff, y = country)) +
   geom_col()
 
-
+View(comb_trade)
 
 # 1-8 TRADE COMPLEMENTARITY INDEX
 # Description: The trade complementarity index indicates to what extent the export profile of the reporter matches, or complements, the import profile of the partner. A high index may indicate that two countries would stand to gain from increased trade, and may be particularly useful in evaluating prospective bilateral or regional trade agreements.
