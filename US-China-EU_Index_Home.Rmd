@@ -15,8 +15,40 @@ library(grid)
 library(rworldmap)
 library(readxl)
 library(tidyverse)
+library(psych)
+library(rstanarm)
+library(ggpubr)
+
+?cor.test()
+
 
 # Home .Rmd file for the US-China-EU economic relationship index
+
+```
+
+
+
+```{r}
+
+library(readxl)
+china_or <- China_Oriented_Weights <- read_excel("China_Oriented_Weights.xlsx") %>%
+rename(country = country...1) %>%
+  select(country, comp)
+
+ggplot(china_or, aes(x = reorder(country, -comp), y = comp)) +
+  geom_col() +
+  coord_flip()
+
+
+china_or2 <- China_Oriented_Weights_2 <- read_excel("China_Oriented_Weights_2.xlsx") %>%
+  rename(country = country...1) %>%
+  select(country, comp)
+
+ggplot(china_or2, aes(x = reorder(country, -comp), y = comp)) +
+  geom_col() +
+  coord_flip()
+
+
 
 ```
 
@@ -25,8 +57,55 @@ library(tidyverse)
 
 # Importing Master Dataset
 
-Master_Data_US_China <- read_excel("Master_Data_US-China.xlsx")
-View(Master_Data_US_China)
+data <- Master_Data_US_China <- read_excel("Master_Data_US-China.xlsx") %>%
+  select(nato, bri, demo, oecd, tii_us, c_invest, human, intervention, ec_decline, corruption)
+
+
+nato <- c(0,1,1,1,0,1,1,1,0,1,1,1,1,0,1,1,1,1,0,1,1,1,1,1,1,1,0,1)
+bri <- c(1,0,1,1,1,0,0,1,1,0,0,1,1,0,1,1,1,1,1,0,1,1,1,1,1,0,0,0)
+oecd <- c(1,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,1)
+
+  
+cor.test(bri, oecd)
+
+scale1 <- data.frame(data)
+
+alpha(scale1)
+
+
+
+
+
+
+pca <- princomp(data)
+
+summary(pca)
+
+plot(pca)
+
+
+fa <- factanal(data, factors = 1, rotation = "varimax")
+
+fa.1 <- factanal(data, factors = 1, rotation = "varimax", scores = "regression")
+
+head(fa.1$scores)
+
+
+frame <- tibble(scale(data$demo))
+frame1 <- tibble(scale(data$nato))
+
+
+ fit_gs <- stan_glm(data = data,
+                       formula = 
+                      tii_us ~ nato + oecd + demo,
+                       family = gaussian(),
+                       refresh = 0)
+ 
+ plot(fit_gs)
+ 
+ fit_gs %>%
+   ggplot(aes(x = nato)) +
+   geom_point()
 
 
 ```
