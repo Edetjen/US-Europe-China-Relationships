@@ -16,14 +16,26 @@ library(dplyr)
 library(unvotes)
 library(widyr)
 
-cors <- un_votes %>%
+library(dplyr)
+
+joined <- un_votes %>%
+  inner_join(un_roll_calls, by = "rcid")
+
+joined = joined[joined$date >= "2004-01-01",]
+joined
+
+cors <- joined %>%
   mutate(vote = as.numeric(vote)) %>%
   pairwise_cor(country, rcid, vote, use = "pairwise.complete.obs", sort = TRUE)
 
 China_cors <- cors %>%
   filter(item1 == "China")
 
-China_cors
+China_cors[order(China_cors[,3],decreasing=TRUE),]
+correlations = data.frame(China_cors)
+
+correlations$rank = rank(-correlations$correlation)
+correlations
 ```
 
 
