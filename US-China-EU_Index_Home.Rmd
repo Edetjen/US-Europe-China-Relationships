@@ -40,13 +40,16 @@ ggplot(china_or, aes(x = reorder(country, -comp), y = comp)) +
   coord_flip()
 
 
-china_or2 <- China_Oriented_Weights_2 <- read_excel("China_Oriented_Weights_2.xlsx") %>%
+china_or2 <- ChinaOr_Final_Data <- read_excel("China_Oriented_Weights_2.xlsx") %>%
   rename(country = country...1) %>%
-  select(country, comp)
+  select(country, comp) %>%
+  drop_na()
 
 ggplot(china_or2, aes(x = reorder(country, -comp), y = comp)) +
-  geom_col() +
-  coord_flip()
+  geom_col(fill = "steelblue", alpha = 0.7) +
+  coord_flip() +
+  theme_classic() +
+  labs(x = "European Country", y = "Potential Bilateral Cooperation\n Composite Index Score")
 
 
 
